@@ -1,0 +1,17 @@
+{
+  "name": "creds",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "type": "module",
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "clipboardy": "^3.0.0",
+    "dotenv": "^16.0.1",
+    "puppeteer": "^14.1.1"
+  }
+}
