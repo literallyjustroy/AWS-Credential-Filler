@@ -1,5 +1,5 @@
-import {createRequire} from "module";
-import {fileURLToPath} from 'url';
+import { createRequire } from "module";
+import { fileURLToPath } from 'url';
 
 const require = createRequire(import.meta.url);
 
