@@ -1,13 +1,17 @@
 import {createRequire} from "module";
+import {fileURLToPath} from 'url';
 
 const require = createRequire(import.meta.url);
 
-require('dotenv').config()
 const puppeteer = require('puppeteer');
 const fs = require("fs");
 const os = require('os');
 const path = require('path');
 import clipboardy from 'clipboardy';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+require('dotenv').config({ path: path.join(__dirname, '.env') });
 
 if (!process.env.URL || !process.env.USERNAME || !process.env.PASSWORD) {
     console.error('Fill in the .env file with your AWS Landing zone URL, USERNAME, and PASSWORD')
