@@ -1,5 +1,5 @@
-import { createRequire } from "module";
-import { fileURLToPath } from 'url';
+import {createRequire} from "module";
+import {fileURLToPath} from 'url';
 
 const require = createRequire(import.meta.url);
 
@@ -7,11 +7,12 @@ const puppeteer = require('puppeteer');
 const fs = require("fs");
 const os = require('os');
 const path = require('path');
+const open = require('open');
 import clipboardy from 'clipboardy';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-require('dotenv').config({ path: path.join(__dirname, '.env') });
+require('dotenv').config({path: path.join(__dirname, '.env')});
 
 if (!process.env.URL || !process.env.USERNAME || !process.env.PASSWORD) {
     console.error('Fill in the .env file with your AWS Landing zone URL, USERNAME, and PASSWORD')
@@ -41,45 +42,62 @@ console.log('Setting AWS Credentials...');
     await context.overridePermissions(process.env.URL.origin, ['clipboard-read'])
 
     const page = await browser.newPage();
-    await page.goto(process.env.URL);
-
-    await page.waitForSelector("#username-input");
-    await page.keyboard.type(process.env.USERNAME);
-    await page.click("#username-submit-button");
-
-    await page.waitForSelector("#password-input");
-    await page.keyboard.type(process.env.PASSWORD);
-    await page.click("#password-submit-button");
-
-    await page.waitForSelector("div[data-testid='vmfa-authentication']");
-    await page.keyboard.type(mfa);
-    await page.click("button[type='submit']");
 
     try {
-        await page.waitForNavigation({timeout: 3000}); // Wait MFA navigation
+        await page.goto(process.env.URL);
+
+        await page.waitForSelector("#username-input");
+        await page.keyboard.type(process.env.USERNAME);
+        await page.click("#username-submit-button");
+
+        await page.waitForSelector("#password-input");
+        await page.keyboard.type(process.env.PASSWORD);
+        await page.click("#password-submit-button");
+
+        const captcha_or_mfa = await page.waitForSelector("#captcha-input, div[data-testid='vmfa-authentication']");
+
+        // Need to check here for id="captcha-input" because if it exists,
+        // we need to display the image at div with data-testid="test-captcha" (get the src attribute)
+        // allow for user input of the captcha
+
+        await page.waitForSelector("div[data-testid='vmfa-authentication']");
+        await page.keyboard.type(mfa);
+        await page.click("button[type='submit']");
+
+        try {
+            await page.waitForNavigation({timeout: 3000}); // Wait MFA navigation
+        } catch (e) {
+            if (e.name === "TimeoutError") {
+                console.error('\nError: MFA code timed-out.')
+                process.exit(1);
+            } else {
+                throw e;
+            }
+        }
+
+        console.log('MFA Accepted')
+
+        await page.waitForSelector("portal-application");
+        await page.click("portal-application");
+
+        await page.waitForSelector(".instance-block");
+        await page.click(".instance-block");
+
+        await page.waitForTimeout(2000);
+
+        await page.waitForSelector("#temp-credentials-button");
+        await page.click("#temp-credentials-button");
+
+        await page.waitForTimeout(2000);
+
+        await page.waitForSelector("#cli-cred-file-code");
+        await page.click("#cli-cred-file-code"); // Copy creds to clipboard
     } catch (e) {
-        console.error(e);
-        console.error('\nError: Page failed to navigate after MFA input. Likely MFA code timed-out.')
-        process.exit(1);
+        console.log('Unrecoverable Error. Displaying screenshot...')
+        await page.screenshot({path: "./error_screenshot.png"});
+        await open('error_screenshot.png');
+        throw e;
     }
-
-    console.log('MFA Accepted')
-
-    await page.waitForSelector("portal-application");
-    await page.click("portal-application");
-
-    await page.waitForSelector(".instance-block");
-    await page.click(".instance-block");
-
-    await page.waitForTimeout(2000);
-
-    await page.waitForSelector("#temp-credentials-button");
-    await page.click("#temp-credentials-button");
-
-    await page.waitForTimeout(2000);
-
-    await page.waitForSelector("#cli-cred-file-code");
-    await page.click("#cli-cred-file-code"); // Copy creds to clipboard
 
     const rawCredsText = await page.evaluate(() => navigator.clipboard.readText());
 
