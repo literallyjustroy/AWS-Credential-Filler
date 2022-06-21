@@ -46,15 +46,15 @@ console.log('Setting AWS Credentials...');
     try {
         await page.goto(process.env.URL);
 
-        await page.waitForSelector("#username-input");
+        await page.waitForSelector("#username-input", {timeout: 5000});
         await page.keyboard.type(process.env.USERNAME);
         await page.click("#username-submit-button");
 
-        await page.waitForSelector("#password-input");
+        await page.waitForSelector("#password-input", {timeout: 5000});
         await page.keyboard.type(process.env.PASSWORD);
         await page.click("#password-submit-button");
 
-        const captcha_or_mfa = await page.waitForSelector("#captcha-input, div[data-testid='vmfa-authentication']");
+        const captcha_or_mfa = await page.waitForSelector("#captcha-input, div[data-testid='vmfa-authentication']", {timeout: 5000});
 
         // Need to check here for id="captcha-input" because if it exists,
         // we need to display the image at div with data-testid="test-captcha" (get the src attribute)
@@ -64,16 +64,7 @@ console.log('Setting AWS Credentials...');
         await page.keyboard.type(mfa);
         await page.click("button[type='submit']");
 
-        try {
-            await page.waitForNavigation({timeout: 3000}); // Wait MFA navigation
-        } catch (e) {
-            if (e.name === "TimeoutError") {
-                console.error('\nError: MFA code timed-out.')
-                process.exit(1);
-            } else {
-                throw e;
-            }
-        }
+        await page.waitForNavigation({timeout: 3000}); // Wait MFA navigation
 
         console.log('MFA Accepted')
 
@@ -93,10 +84,11 @@ console.log('Setting AWS Credentials...');
         await page.waitForSelector("#cli-cred-file-code");
         await page.click("#cli-cred-file-code"); // Copy creds to clipboard
     } catch (e) {
-        console.log('Unrecoverable Error. Displaying screenshot...')
+        console.error(e);
+        console.log('\nUnrecoverable Error. Displaying screenshot...')
         await page.screenshot({path: "./error_screenshot.png"});
         await open('error_screenshot.png');
-        throw e;
+        process.exit(1);
     }
 
     const rawCredsText = await page.evaluate(() => navigator.clipboard.readText());
