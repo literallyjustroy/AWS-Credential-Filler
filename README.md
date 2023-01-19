@@ -7,16 +7,21 @@ This project:
 4. Saves them as the \[default\] account in the users ~/.aws/credentials file
 5. Clears the clipboard
 
-## Usage
+## Setup
 
-Copy your MFA code to your clipboard (or paste it as an optional first argument) and run the following command:
-```shell
-npm run start
-```
+You should setup a `.env` file following the format of the `.env.example` file.
 
 I'd also recommend binding this to an alias. For example, add the following to your `~/.zshrc` file:
+
 ```shell
 alias creds="node ~/dev/auto/creds/index.js"
 ```
 
 This allows you to run `creds` from anywhere
+## Usage
+
+Copy your MFA code to your clipboard (or paste it as an optional first argument) and run the following command:
+
+```shell
+npm run start
+```
