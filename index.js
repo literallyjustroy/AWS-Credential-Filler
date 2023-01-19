@@ -86,8 +86,8 @@ console.log('Setting AWS Credentials...');
     } catch (e) {
         console.error(e);
         console.log('\nUnrecoverable Error. Displaying screenshot...')
-        await page.screenshot({path: "./error_screenshot.png"});
-        await open('error_screenshot.png');
+        await page.screenshot({path: path.join(__dirname, 'error_screenshot.png')});
+        await open(path.join(__dirname, 'error_screenshot.png'));
         process.exit(1);
     }
 
