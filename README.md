@@ -1,8 +1,10 @@
 # AWS Landing Zone Creds Fill
 
+![Recording of the tool](https://user-images.githubusercontent.com/56088145/222529219-6ba07ab7-9d75-43c4-a0a7-539de37b973a.gif)
+
 This project:
 1. Navigates to a given AWS Landing zone
-2. Signs in with the provided USERNAME and PASSWORD(using MFA passed as an argument or on the clipboard)
+2. Signs in with the provided USERNAME and PASSWORD (using MFA passed as an argument or on the clipboard)
 3. Copies the CLI credentials from the first account in the list to the clipboard
 4. Saves them as the \[default\] account in the users ~/.aws/credentials file
 5. Clears the clipboard
