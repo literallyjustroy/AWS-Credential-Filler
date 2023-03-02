@@ -1,5 +1,7 @@
 # AWS Landing Zone Creds Fill
 
+![Example of tool working](https://user-images.githubusercontent.com/56088145/222530604-35f7472a-3119-4ebc-80ca-a2ad0ac94471.gif)
+
 This project:
 1. Navigates to a given AWS Landing zone
 2. Signs in with the provided USERNAME and PASSWORD (using MFA passed as an argument or on the clipboard)
