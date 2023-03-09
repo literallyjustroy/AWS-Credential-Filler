@@ -37,7 +37,7 @@ if (args.length === 1) {
 console.log('Setting AWS Credentials...');
 
 (async () => {
-    const browser = await puppeteer.launch();
+    const browser = await puppeteer.launch(); // add {headless: false}
     const context = browser.defaultBrowserContext();
     await context.overridePermissions(process.env.URL.origin, ['clipboard-read'])
 
@@ -78,6 +78,11 @@ console.log('Setting AWS Credentials...');
 
         await page.waitForSelector("#temp-credentials-button");
         await page.click("#temp-credentials-button");
+
+        await page.waitForTimeout(2000);
+
+        const [button] = await page.$x("//a[contains(., 'Manually add a profile to your AWS credentials file')]");
+        await button.click();
 
         await page.waitForTimeout(2000);
 
