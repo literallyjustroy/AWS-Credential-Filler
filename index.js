@@ -79,10 +79,10 @@ console.log('Setting AWS Credentials...');
         await page.waitForSelector("#temp-credentials-button");
         await page.click("#temp-credentials-button");
 
-        await page.waitForTimeout(2000);
+        // await page.waitForTimeout(2000);
 
-        const [button] = await page.$x("//a[contains(., 'Manually add a profile to your AWS credentials file')]");
-        await button.click();
+        // const [button] = await page.$x("//a[contains(., 'Manually add a profile to your AWS credentials file')]");
+        // await button.click();
 
         await page.waitForTimeout(2000);
 
